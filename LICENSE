@@ -1,0 +1,49 @@
+CREWRITE SOURCE-AVAILABLE LICENSE
+
+Copyright (c) 2026 Edic189 / Luka Prlić. All Rights Reserved.
+
+Subject to the terms and conditions of this License, the Author hereby grants
+you a non-exclusive, non-transferable, royalty-free license to download, view,
+and compile the source code of this software solely for educational, personal
+review, and testing purposes.
+
+1. DEFINITIONS
+   - "Software" refers to the CreWrite note-taking application, including all
+     source code, documentation, and assets contained in this repository.
+   - "Author" refers to the original creator and copyright holder, Edic (Luka Prlić).
+
+2. ALLOWED USES
+   - You may view, inspect, and analyze the source code publicly available in
+     this repository.
+   - You may clone or download a local copy for your personal, non-commercial use.
+   - You may suggest improvements by opening Issues or submitting Pull Requests.
+
+3. STRICT PROHIBITIONS (WHAT YOU CANNOT DO)
+   - Commercial Exploitation: You are STRICTLY FORBIDDEN from selling, renting,
+     leasing, or licensing this Software or any modified version of it.
+   - Repackaging & Redistribution: You are STRICTLY FORBIDDEN from packaging this
+     Software under a different name, brand, or logo and distributing it to
+     third parties, either for free or for profit.
+   - Hosting as a Service: You cannot host or provide this Software as a
+     commercial cloud service or product.
+
+4. CONTRIBUTIONS AND OWNERSHIP
+   - By submitting a Pull Request, patch, or code contribution to this
+     repository, you explicitly transfer and grant full, permanent,
+     unconditional, and unrestricted copyright ownership of that contributed
+     code to the Author. The Author reserves the right to include, modify,
+     or commercialize any contributed code under any proprietary terms.
+
+5. TERMINATION
+   - Any violation of this License automatically terminates your rights to
+     use or view this Software, and the Author reserves the right to take legal
+     action or submit DMCA takedown notices on external platforms.
+
+6. DISCLAIMER OF WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.

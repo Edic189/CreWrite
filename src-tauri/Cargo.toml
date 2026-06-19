@@ -1,0 +1,51 @@
+[package]
+name = "crewrite"
+version = "0.1.0"
+description = "CreWrite — a local-first, plain-text Markdown note app"
+authors = ["CreWrite"]
+license-file = "../LICENSE"
+edition = "2021"
+rust-version = "1.77"
+
+# The frontend talks to this crate as a library; `main.rs` is just a thin shim.
+[lib]
+name = "crewrite_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+notify = "6"
+thiserror = "1"
+# Move deleted notes to the OS Trash (recoverable via Finder/Explorer).
+trash = "5"
+# Built-in export (compiled in — no external tools): Markdown → DOCX / PDF.
+docx-rs = "0.4"
+genpdf = { version = "0.2", features = ["images"] }
+# Embed rasterized Mermaid diagrams (PNGs produced in the webview) into exports.
+# Pinned to genpdf's `image` version so `Image::from_dynamic_image` types match.
+image = "0.23"
+base64 = "0.22"
+# Phase 2: Markdown rendering pipeline.
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+ammonia = "4"
+# Phase 3: wikilink/tag extraction.
+regex = "1"
+
+[features]
+# Default keeps a small footprint; add e.g. devtools in dev profiles as needed.
+default = []
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
+panic = "abort"

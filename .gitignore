@@ -1,0 +1,19 @@
+# Rust / Tauri
+/target
+/src-tauri/target
+/src-tauri/gen
+
+# Node / frontend
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor / OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Claude Code — keep all tooling config out of the repo
+.claude/
