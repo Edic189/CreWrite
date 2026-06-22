@@ -1,6 +1,6 @@
 [package]
 name = "crewrite"
-version = "0.1.0"
+version = "1.0.0"
 description = "CreWrite — a local-first, plain-text Markdown note app"
 authors = ["CreWrite"]
 license-file = "../LICENSE"
