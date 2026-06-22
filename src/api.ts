@@ -9,6 +9,7 @@ import type {
   AppInfo,
   ChangeEvent,
   FileNode,
+  GitStatus,
   GraphData,
   NoteRef,
   RenderedNote,
@@ -50,6 +51,28 @@ export function setSettings(settings: Settings): Promise<void> {
 /** App version + config-file location, for the Settings → About section. */
 export function appInfo(): Promise<AppInfo> {
   return invoke<AppInfo>("app_info");
+}
+
+// --- Git (in-app vault versioning) ----------------------------------------
+
+/** Current Git state of the vault (is-repo + change counts). */
+export function gitStatus(): Promise<GitStatus> {
+  return invoke<GitStatus>("git_status");
+}
+
+/** Initialize a Git repository at the vault root; returns the new status. */
+export function gitInit(): Promise<GitStatus> {
+  return invoke<GitStatus>("git_init");
+}
+
+/** Stage all changes and commit them; returns the resulting status. */
+export function gitCommit(message: string): Promise<GitStatus> {
+  return invoke<GitStatus>("git_commit", { message });
+}
+
+/** Discard all changes since the last commit; returns the resulting status. */
+export function gitDiscard(): Promise<GitStatus> {
+  return invoke<GitStatus>("git_discard");
 }
 
 /** Export notes to "docx"/"pdf" (built-in); resolves to #files written, or null if cancelled.

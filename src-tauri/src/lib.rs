@@ -8,6 +8,7 @@ mod compile;
 mod config;
 mod error;
 mod export;
+mod git;
 mod index;
 mod markdown;
 mod state;
@@ -56,6 +57,10 @@ pub fn run() {
             commands::app_info,
             commands::export_documents,
             commands::export_mermaid_sources,
+            commands::git_status,
+            commands::git_init,
+            commands::git_commit,
+            commands::git_discard,
         ])
         // Save-before-quit: don't let the window close until the frontend has
         // flushed any pending (debounced) edit. We prevent the close, ask the

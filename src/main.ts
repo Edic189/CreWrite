@@ -26,6 +26,7 @@ import { iconSvg } from "./ui/icons";
 import { mermaidToPngBase64 } from "./ui/mermaidImage";
 import { confirmDialog, promptText } from "./ui/modal";
 import { Preview } from "./ui/preview";
+import { GitPanel } from "./ui/git";
 import { SettingsPanel } from "./ui/settings";
 import { expandFolder, expandTo, renderTree } from "./ui/tree";
 
@@ -77,6 +78,7 @@ app.innerHTML = `
         <div class="empty-hint">Open a vault to begin.</div>
       </nav>
       <div class="search-results" id="search-results" hidden></div>
+      <div id="git-mount"></div>
       <footer class="sidebar-footer">
         <button id="btn-settings" title="Settings"></button>
       </footer>
@@ -137,6 +139,7 @@ const el = {
   contextTitle: document.querySelector<HTMLSpanElement>("#context-title")!,
   contextList: document.querySelector<HTMLDivElement>("#context-list")!,
   btnSettings: document.querySelector<HTMLButtonElement>("#btn-settings")!,
+  gitMount: document.querySelector<HTMLDivElement>("#git-mount")!,
 };
 
 // Material Symbols icons for the toolbar controls (replaces emoji glyphs).
@@ -213,6 +216,98 @@ const settingsPanel = new SettingsPanel(document.body, {
     persistSettings(next);
   },
 });
+
+// --- Git panel (in-app vault versioning) -----------------------------------
+
+const gitPanel = new GitPanel(el.gitMount, {
+  onInit: () => void gitInitVault(),
+  onCommit: () => void gitCommitVault(),
+  onDiscard: () => void gitDiscardVault(),
+});
+
+/** Re-read and render the vault's Git status (hidden when no vault is open). */
+async function refreshGitStatus(): Promise<void> {
+  if (!getState().vaultRoot) {
+    gitPanel.render(null);
+    return;
+  }
+  try {
+    gitPanel.render(await api.gitStatus());
+  } catch (err) {
+    console.warn("[gitStatus]", err); // non-critical; leave the panel as-is
+  }
+}
+
+async function gitInitVault(): Promise<void> {
+  try {
+    gitPanel.render(await api.gitInit());
+    setSaveStatus("Git repository created");
+  } catch (err) {
+    reportError("gitInit", err);
+  }
+}
+
+async function gitCommitVault(): Promise<void> {
+  const message = await promptText({
+    title: "Commit message",
+    value: `Notes — ${new Date().toLocaleString()}`,
+    confirmLabel: "Commit",
+  });
+  if (!message) return; // cancelled or left empty
+  try {
+    setSaveStatus("Committing…");
+    gitPanel.render(await api.gitCommit(message));
+    setSaveStatus("Committed");
+  } catch (err) {
+    reportError("gitCommit", err);
+  }
+}
+
+async function gitDiscardVault(): Promise<void> {
+  const ok = await confirmDialog({
+    title: "Discard all changes?",
+    message:
+      "This restores every note to the last commit — modified notes are reverted and notes created since then are deleted. This can't be undone.",
+    confirmLabel: "Discard changes",
+  });
+  if (!ok) return;
+  try {
+    gitPanel.render(await api.gitDiscard());
+    await reloadAfterDiskChange(); // the working tree changed on disk
+    setSaveStatus("Changes discarded");
+  } catch (err) {
+    reportError("gitDiscard", err);
+  }
+}
+
+/** Re-sync the UI after files change on disk underneath us (e.g. git discard). */
+async function reloadAfterDiskChange(): Promise<void> {
+  try {
+    setState({ tree: await api.readVaultTree() });
+    refreshTreeView();
+    const { activePath } = getState();
+    if (activePath) {
+      try {
+        const content = await api.readNote(activePath);
+        setState({ savedContent: content, dirty: false });
+        editor.setContent(content);
+        void updatePreview();
+      } catch {
+        // The open note no longer exists — clear the editor.
+        setState({ activePath: null, savedContent: "", dirty: false });
+        el.noteTitle.textContent = "—";
+        setInlineTitle(null);
+        editor.clear();
+        preview.setEmpty();
+      }
+    }
+    await api.refreshIndex();
+    await refreshContext();
+    await refreshTagCache();
+  } catch (err) {
+    reportError("reloadAfterDiskChange", err);
+  }
+}
 
 /** Apply settings that have a live visual/editor effect (others read on use). */
 function applySettings(s: Settings): void {
@@ -677,6 +772,7 @@ const scheduleIndexRefresh = debounce(() => {
       await api.refreshIndex();
       await refreshContext();
       await refreshTagCache();
+      await refreshGitStatus(); // saved edits change the working tree
     } catch (err) {
       reportError("refreshIndex", err);
     }
@@ -777,6 +873,7 @@ function applyVault(info: VaultInfo): void {
   refreshTreeView();
   void showBacklinks();
   void refreshTagCache(); // seed editor #-autocomplete
+  void refreshGitStatus(); // show the vault's Git panel
 }
 
 /** Open the native folder picker and load the chosen vault. */
@@ -1151,6 +1248,7 @@ async function handleVaultChanged(event: ChangeEvent): Promise<void> {
       await api.refreshIndex();
       await refreshContext();
       await refreshTagCache();
+      await refreshGitStatus(); // files added/removed on disk
     } catch (err) {
       reportError("watcher.refreshTree", err);
     }

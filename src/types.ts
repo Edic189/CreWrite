@@ -95,6 +95,20 @@ export interface AppInfo {
   configPath: string | null;
 }
 
+/** Git state of the current vault (mirrors the Rust `GitStatus`). */
+export interface GitStatus {
+  /** The vault is its own Git repository. */
+  isRepo: boolean;
+  /** At least one commit exists (Discard has a baseline). */
+  hasHead: boolean;
+  /** Files changed since the last commit. */
+  filesChanged: number;
+  /** Lines inserted since the last commit. */
+  added: number;
+  /** Lines deleted since the last commit. */
+  removed: number;
+}
+
 /** A note reference (backlinks, tag results). */
 export interface NoteRef {
   path: string;

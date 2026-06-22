@@ -14,6 +14,7 @@ use crate::compile;
 use crate::config;
 use crate::error::{AppError, AppResult};
 use crate::export;
+use crate::git;
 use crate::index::{self, GraphData, NoteRef, TagCount};
 use crate::markdown::{self, RenderedNote};
 use crate::state::AppState;
@@ -310,6 +311,40 @@ pub async fn export_documents(
         }
         Ok(Some(count))
     }
+}
+
+/// Git state of the current vault (is-repo, change counts) for the sidebar panel.
+#[tauri::command]
+pub async fn git_status(state: State<'_, AppState>) -> AppResult<git::GitStatus> {
+    state.with_root(git::status)
+}
+
+/// Initialize a Git repository at the vault root.
+#[tauri::command]
+pub async fn git_init(state: State<'_, AppState>) -> AppResult<git::GitStatus> {
+    state.with_root(|root| {
+        git::init(root)?;
+        git::status(root)
+    })
+}
+
+/// Stage all changes and commit them with `message`. Returns the new status.
+#[tauri::command]
+pub async fn git_commit(state: State<'_, AppState>, message: String) -> AppResult<git::GitStatus> {
+    let msg = if message.trim().is_empty() { "Update notes" } else { message.trim() };
+    state.with_root(|root| {
+        git::commit_all(root, msg)?;
+        git::status(root)
+    })
+}
+
+/// Discard all uncommitted changes (restore the working tree to the last commit).
+#[tauri::command]
+pub async fn git_discard(state: State<'_, AppState>) -> AppResult<git::GitStatus> {
+    state.with_root(|root| {
+        git::discard(root)?;
+        git::status(root)
+    })
 }
 
 /// The trimmed source of every unique ```mermaid block in the export set, so the

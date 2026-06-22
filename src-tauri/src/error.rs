@@ -54,6 +54,10 @@ pub enum AppError {
     #[error("{0}")]
     Export(String),
 
+    /// A Git (libgit2) operation failed.
+    #[error("git: {0}")]
+    Git(String),
+
     /// A shared lock was poisoned by a panic in another thread.
     #[error("internal state lock was poisoned")]
     LockPoisoned,
@@ -77,6 +81,7 @@ impl AppError {
             AppError::NotMarkdown(_) => "NotMarkdown",
             AppError::NotFound(_) => "NotFound",
             AppError::Export(_) => "Export",
+            AppError::Git(_) => "Git",
             AppError::Io { .. } => "Io",
             AppError::Watcher(_) => "Watcher",
             AppError::LockPoisoned => "LockPoisoned",

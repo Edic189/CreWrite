@@ -1032,6 +1032,76 @@ body {
   background: var(--bg-hover);
 }
 
+/* ---- Git panel (sidebar, above the footer) ---- */
+.git-panel {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.git-panel[hidden] {
+  display: none;
+}
+.git-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+.git-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.git-added {
+  color: #6fbf73;
+}
+.git-removed {
+  color: var(--error);
+}
+.git-files {
+  color: var(--text-dim);
+  margin-left: auto;
+}
+.git-clean {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.git-actions {
+  display: flex;
+  gap: 6px;
+}
+.git-btn {
+  flex: 1;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 5px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.git-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.git-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.git-init {
+  width: 100%;
+}
+.git-danger:hover:not(:disabled) {
+  border-color: var(--error);
+  color: var(--error);
+}
+
 /* ---- Settings panel ---- */
 .settings-overlay {
   position: fixed;

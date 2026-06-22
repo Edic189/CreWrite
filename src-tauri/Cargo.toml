@@ -38,6 +38,9 @@ pulldown-cmark = { version = "0.12", default-features = false, features = ["html
 ammonia = "4"
 # Phase 3: wikilink/tag extraction.
 regex = "1"
+# In-app vault versioning. Vendored libgit2 (compiled in — no system `git`
+# needed); local-only, so ssh/https/openssl features are disabled.
+git2 = { version = "0.19", default-features = false, features = ["vendored-libgit2"] }
 
 [features]
 # Default keeps a small footprint; add e.g. devtools in dev profiles as needed.
