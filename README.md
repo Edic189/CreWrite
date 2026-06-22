@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logo.svg" alt="CreWrite" width="440" />
+  <img src="screenshots/banner.svg" alt="CreWrite" width="640" />
 </div>
 
 # CreWrite
