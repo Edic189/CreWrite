@@ -59,6 +59,15 @@ export class GraphView {
   private pointerMoved = false;
   private lastPointer = { x: 0, y: 0 };
 
+  // Theme/accent colors, refreshed each time the graph opens (so a custom
+  // accent or theme change is picked up). Defaults match the dark theme.
+  private colors = {
+    accent: "#4fa3ff",
+    accentHover: "#7cc0ff",
+    text: "#d4d4d4",
+    textDim: "rgba(212,212,212,0.85)",
+  };
+
   constructor(mount: HTMLElement, private cb: GraphCallbacks) {
     this.overlay = document.createElement("div");
     this.overlay.className = "graph-overlay";
@@ -87,6 +96,7 @@ export class GraphView {
   open(data: GraphData): void {
     // Show first, THEN measure — a hidden element reports a 0×0 rect.
     this.overlay.hidden = false;
+    this.refreshColors(); // pick up the current theme / custom accent
     const { width, height } = this.sizeCanvas();
 
     // Seed positions on a circle so the layout unfolds predictably.
@@ -195,6 +205,18 @@ export class GraphView {
     this.alpha *= 0.992; // cool down
   }
 
+  /** Cache the current theme/accent colors from CSS (called on open). */
+  private refreshColors(): void {
+    const cs = getComputedStyle(document.documentElement);
+    const read = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
+    this.colors = {
+      accent: read("--accent", "#4fa3ff"),
+      accentHover: read("--accent-hover", "#7cc0ff"),
+      text: read("--text", "#d4d4d4"),
+      textDim: read("--text-dim", "rgba(212,212,212,0.85)"),
+    };
+  }
+
   private draw(): void {
     const { ctx } = this;
     // clearRect runs through the dpr-scaled transform, so use logical size.
@@ -203,8 +225,10 @@ export class GraphView {
     ctx.translate(this.offsetX, this.offsetY);
     ctx.scale(this.scale, this.scale);
 
-    // Edges.
-    ctx.strokeStyle = "rgba(150,150,150,0.25)";
+    // Edges — a faint wash of the accent, so they read on any theme.
+    ctx.save();
+    ctx.globalAlpha = 0.28;
+    ctx.strokeStyle = this.colors.accent;
     ctx.lineWidth = 1;
     for (const e of this.edges) {
       ctx.beginPath();
@@ -212,6 +236,7 @@ export class GraphView {
       ctx.lineTo(e.target.x, e.target.y);
       ctx.stroke();
     }
+    ctx.restore();
 
     // Nodes.
     for (const n of this.nodes) {
@@ -219,12 +244,12 @@ export class GraphView {
       const isHover = n === this.hover;
       ctx.beginPath();
       ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = isHover ? "#7cc0ff" : "#4fa3ff";
+      ctx.fillStyle = isHover ? this.colors.accentHover : this.colors.accent;
       ctx.fill();
 
       // Labels for hovered or well-connected nodes (avoids clutter).
       if (isHover || n.degree >= 2 || this.scale > 1.4) {
-        ctx.fillStyle = isHover ? "#fff" : "rgba(212,212,212,0.85)";
+        ctx.fillStyle = isHover ? this.colors.text : this.colors.textDim;
         ctx.font = `${12 / this.scale + 2}px -apple-system, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText(n.label, n.x, n.y - r - 4);

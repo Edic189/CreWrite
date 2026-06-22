@@ -179,6 +179,7 @@ export class Editor {
   private tab = new Compartment();
   private pairs = new Compartment();
   private gutter = new Compartment();
+  private activeLine = new Compartment();
   private loading = false;
   private debounceTimer: number | null = null;
   private debounceMs = 600;
@@ -204,7 +205,7 @@ export class Editor {
       extensions: [
         history(),
         drawSelection(),
-        highlightActiveLine(),
+        this.activeLine.of(highlightActiveLine()),
         bracketMatching(),
         highlightSelectionMatches(),
         this.gutter.of([]),
@@ -291,6 +292,12 @@ export class Editor {
   setAutoPair(on: boolean): void {
     this.view.dispatch({
       effects: this.pairs.reconfigure(on ? closeBrackets() : []),
+    });
+  }
+
+  setActiveLineHighlight(on: boolean): void {
+    this.view.dispatch({
+      effects: this.activeLine.reconfigure(on ? highlightActiveLine() : []),
     });
   }
 

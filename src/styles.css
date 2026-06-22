@@ -164,6 +164,128 @@
   --active-line: rgba(0, 0, 0, 0.035);
 }
 
+/* ---- Fun themes (all dark) ---- */
+
+/* Dracula — classic purple. */
+:root[data-theme="dracula"] {
+  --bg: #282a36;
+  --bg-sidebar: #21222c;
+  --bg-hover: #343746;
+  --bg-active: #44475a;
+  --border: #3a3c4e;
+  --text: #f8f8f2;
+  --text-dim: #8a8ea3;
+  --accent: #bd93f9;
+  --error: #ff5555;
+  --code-bg: #2d2f3b;
+  --pre-bg: #1e1f29;
+  --scrollbar: #44475a;
+  --accent-text: #d6bbfb;
+  --accent-contrast: #21222c;
+  --accent-hover: #caa9fa;
+  --active-line: rgba(255, 255, 255, 0.04);
+}
+
+/* Nord — arctic frost. */
+:root[data-theme="nord"] {
+  --bg: #2e3440;
+  --bg-sidebar: #2b303b;
+  --bg-hover: #3b4252;
+  --bg-active: #434c5e;
+  --border: #3b4252;
+  --text: #d8dee9;
+  --text-dim: #7b8494;
+  --accent: #88c0d0;
+  --error: #bf616a;
+  --code-bg: #3b4252;
+  --pre-bg: #272b35;
+  --scrollbar: #434c5e;
+  --accent-text: #a7cfdc;
+  --accent-contrast: #2e3440;
+  --accent-hover: #9fcad7;
+  --active-line: rgba(255, 255, 255, 0.03);
+}
+
+/* Gruvbox — retro warm orange. */
+:root[data-theme="gruvbox"] {
+  --bg: #282828;
+  --bg-sidebar: #1d2021;
+  --bg-hover: #3c3836;
+  --bg-active: #504945;
+  --border: #3c3836;
+  --text: #ebdbb2;
+  --text-dim: #a89984;
+  --accent: #fe8019;
+  --error: #fb4934;
+  --code-bg: #32302f;
+  --pre-bg: #1d2021;
+  --scrollbar: #504945;
+  --accent-text: #ffb454;
+  --accent-contrast: #282828;
+  --accent-hover: #ff9248;
+  --active-line: rgba(255, 255, 255, 0.04);
+}
+
+/* Mocha — warm coffee. */
+:root[data-theme="mocha"] {
+  --bg: #2b2420;
+  --bg-sidebar: #241e1a;
+  --bg-hover: #3a322c;
+  --bg-active: #4a3f36;
+  --border: #3a322c;
+  --text: #ece0d4;
+  --text-dim: #a8978a;
+  --accent: #d2a679;
+  --error: #d9706a;
+  --code-bg: #332b25;
+  --pre-bg: #1f1a16;
+  --scrollbar: #4a3f36;
+  --accent-text: #e0b690;
+  --accent-contrast: #241e1a;
+  --accent-hover: #d6a37c;
+  --active-line: rgba(255, 255, 255, 0.035);
+}
+
+/* Neon — cyberpunk cyan on near-black. */
+:root[data-theme="neon"] {
+  --bg: #0d0f1a;
+  --bg-sidebar: #0a0c14;
+  --bg-hover: #15182a;
+  --bg-active: #1f2540;
+  --border: #1c2138;
+  --text: #e6f1ff;
+  --text-dim: #7a8bbf;
+  --accent: #00e5ff;
+  --error: #ff3d81;
+  --code-bg: #131726;
+  --pre-bg: #080a12;
+  --scrollbar: #1f2540;
+  --accent-text: #7df9ff;
+  --accent-contrast: #04121a;
+  --accent-hover: #5cf2ff;
+  --active-line: rgba(0, 229, 255, 0.06);
+}
+
+/* Rosé — soft rose on plum. */
+:root[data-theme="rose"] {
+  --bg: #232136;
+  --bg-sidebar: #2a273f;
+  --bg-hover: #38354e;
+  --bg-active: #44415e;
+  --border: #393552;
+  --text: #e0def4;
+  --text-dim: #908caa;
+  --accent: #ea9a97;
+  --error: #eb6f92;
+  --code-bg: #2a283e;
+  --pre-bg: #1c1a2e;
+  --scrollbar: #44415e;
+  --accent-text: #f0b3b0;
+  --accent-contrast: #232136;
+  --accent-hover: #efb0ad;
+  --active-line: rgba(255, 255, 255, 0.04);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -368,9 +490,10 @@ body {
   background: var(--bg-hover);
 }
 
-/* The one clear selection highlight — folder or file (type shown by its icon). */
+/* The one clear selection highlight — folder or file (type shown by its icon).
+   Accent-derived so a custom accent color is reflected here too. */
 .tree-row.selected {
-  background: var(--bg-active);
+  background: color-mix(in srgb, var(--accent) 30%, var(--bg-sidebar));
 }
 .tree-row.selected .tree-label {
   font-weight: 600;

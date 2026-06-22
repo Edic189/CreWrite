@@ -44,7 +44,9 @@ export interface RenderedNote {
 }
 
 /** User settings (mirrors the Rust `Settings`). */
-export type Theme = "dark" | "light" | "grey" | "forest" | "winter" | "sea" | "retro" | "summer";
+export type Theme =
+  | "dark" | "light" | "grey" | "forest" | "winter" | "sea" | "retro" | "summer"
+  | "dracula" | "nord" | "gruvbox" | "mocha" | "neon" | "rose";
 export type FontFamily = "mono" | "sans" | "serif";
 
 export interface Settings {
@@ -66,6 +68,13 @@ export interface Settings {
   newNoteLocation: "root" | "current";
   autosaveMs: number;
   confirmDelete: boolean;
+  highlightActiveLine: boolean;
+  uiScale: number;
+  reopenLastVault: boolean;
+  showMdExtension: boolean;
+  gitEnabled: boolean;
+  gitAutoCommitMinutes: number;
+  confirmDiscard: boolean;
 }
 
 /** Defaults — must mirror the Rust `Settings::default()`. */
@@ -87,6 +96,13 @@ export const DEFAULT_SETTINGS: Settings = {
   newNoteLocation: "current",
   autosaveMs: 600,
   confirmDelete: true,
+  highlightActiveLine: true,
+  uiScale: 1.0,
+  reopenLastVault: true,
+  showMdExtension: false,
+  gitEnabled: true,
+  gitAutoCommitMinutes: 0,
+  confirmDiscard: true,
 };
 
 /** App version + config location (from the `app_info` command). */

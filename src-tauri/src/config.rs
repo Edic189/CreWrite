@@ -53,6 +53,20 @@ pub struct Settings {
     pub autosave_ms: u32,
     /// Ask for confirmation before deleting.
     pub confirm_delete: bool,
+    /// Highlight the editor's current line.
+    pub highlight_active_line: bool,
+    /// Whole-interface zoom factor (1.0 = 100%).
+    pub ui_scale: f32,
+    /// Auto-reopen the last vault on launch.
+    pub reopen_last_vault: bool,
+    /// Show file extensions (e.g. `.md`) in the file tree.
+    pub show_md_extension: bool,
+    /// Show the Git versioning panel and enable its features.
+    pub git_enabled: bool,
+    /// Auto-commit Git changes every N minutes (0 = off).
+    pub git_auto_commit_minutes: u32,
+    /// Ask for confirmation before discarding Git changes.
+    pub confirm_discard: bool,
 }
 
 impl Default for Settings {
@@ -75,6 +89,13 @@ impl Default for Settings {
             new_note_location: "current".into(),
             autosave_ms: 600,
             confirm_delete: true,
+            highlight_active_line: true,
+            ui_scale: 1.0,
+            reopen_last_vault: true,
+            show_md_extension: false,
+            git_enabled: true,
+            git_auto_commit_minutes: 0,
+            confirm_discard: true,
         }
     }
 }

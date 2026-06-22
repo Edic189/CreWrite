@@ -19,10 +19,12 @@ export interface TreeCallbacks {
   onMove: (fromPath: string, toDir: string) => void;
 }
 
-/** Highlight state passed in on each render. */
+/** Per-render display state. */
 export interface TreeHighlight {
   /** Path of the currently-selected row (a note or a folder); null = none. */
   selectedPath: string | null;
+  /** Show file extensions (e.g. `.md`) in file labels. */
+  showExtensions?: boolean;
 }
 
 /** Folder open/closed state, keyed by relative path, survives re-renders. */
@@ -114,8 +116,10 @@ function renderNode(node: FileNode, highlight: TreeHighlight, cb: TreeCallbacks)
 
     const label = document.createElement("span");
     label.className = "tree-label";
-    // Drop the ".md" for a cleaner, Obsidian-like look.
-    label.textContent = node.name.replace(/\.(md|markdown)$/i, "");
+    // Drop the ".md" for a cleaner, Obsidian-like look (unless the user opted in).
+    label.textContent = highlight.showExtensions
+      ? node.name
+      : node.name.replace(/\.(md|markdown)$/i, "");
 
     row.append(icon, label);
     row.addEventListener("click", (e) => {

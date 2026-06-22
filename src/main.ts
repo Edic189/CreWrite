@@ -225,10 +225,39 @@ const gitPanel = new GitPanel(el.gitMount, {
   onDiscard: () => void gitDiscardVault(),
 });
 
+// Auto-commit timer (0 = off). Reconfigured whenever the setting changes.
+let autoCommitTimer: number | null = null;
+let autoCommitMinutes = -1;
+let lastGitEnabled = true; // tracks gitEnabled so we only re-render on a real toggle
+function configureAutoCommit(minutes: number): void {
+  if (minutes === autoCommitMinutes) return; // no change
+  autoCommitMinutes = minutes;
+  if (autoCommitTimer !== null) {
+    window.clearInterval(autoCommitTimer);
+    autoCommitTimer = null;
+  }
+  if (minutes > 0) {
+    autoCommitTimer = window.setInterval(() => void autoCommitTick(), minutes * 60_000);
+  }
+}
+
+/** If the vault is a repo with changes, commit them (used by the auto-commit timer). */
+async function autoCommitTick(): Promise<void> {
+  if (!getState().vaultRoot) return;
+  try {
+    const status = await api.gitStatus();
+    if (status.isRepo && status.filesChanged > 0) {
+      gitPanel.render(await api.gitCommit(`Auto-commit — ${new Date().toLocaleString()}`));
+    }
+  } catch (err) {
+    console.warn("[auto-commit]", err); // non-critical
+  }
+}
+
 /** Re-read and render the vault's Git status (hidden when no vault is open). */
 async function refreshGitStatus(): Promise<void> {
-  if (!getState().vaultRoot) {
-    gitPanel.render(null);
+  if (!settings.gitEnabled || !getState().vaultRoot) {
+    gitPanel.render(null); // Git turned off, or no vault open
     return;
   }
   try {
@@ -264,13 +293,15 @@ async function gitCommitVault(): Promise<void> {
 }
 
 async function gitDiscardVault(): Promise<void> {
-  const ok = await confirmDialog({
-    title: "Discard all changes?",
-    message:
-      "This restores every note to the last commit — modified notes are reverted and notes created since then are deleted. This can't be undone.",
-    confirmLabel: "Discard changes",
-  });
-  if (!ok) return;
+  if (settings.confirmDiscard) {
+    const ok = await confirmDialog({
+      title: "Discard all changes?",
+      message:
+        "This restores every note to the last commit — modified notes are reverted and notes created since then are deleted. This can't be undone.",
+      confirmLabel: "Discard changes",
+    });
+    if (!ok) return;
+  }
   try {
     gitPanel.render(await api.gitDiscard());
     await reloadAfterDiskChange(); // the working tree changed on disk
@@ -319,12 +350,21 @@ function applySettings(s: Settings): void {
   root.style.setProperty("--editor-line-height", String(s.editorLineHeight));
   root.style.setProperty("--content-width", `${s.contentWidth}px`);
   root.classList.toggle("readable-width", s.readableLineWidth);
+  // Whole-UI zoom (WKWebView/WebView2/WebKitGTK all support `zoom`).
+  root.style.setProperty("zoom", String(s.uiScale || 1));
   editor.setLineWrap(s.lineWrap);
   editor.setSpellcheck(s.spellcheck);
   editor.setLineNumbers(s.lineNumbers);
   editor.setAutoPair(s.autoPair);
+  editor.setActiveLineHighlight(s.highlightActiveLine);
   editor.setIndent(s.tabSize, s.indentWithTabs);
   editor.setAutosaveDelay(s.autosaveMs);
+  configureAutoCommit(s.gitEnabled ? s.gitAutoCommitMinutes : 0);
+  if (s.gitEnabled !== lastGitEnabled) {
+    lastGitEnabled = s.gitEnabled;
+    void refreshGitStatus(); // show or hide the Git panel
+  }
+  refreshTreeView(); // reflect the show-extensions setting
 }
 
 /** Apply a custom accent (deriving hover/contrast/active-line), or clear it. */
@@ -512,7 +552,7 @@ function refreshTreeView(): void {
   renderTree(
     el.tree,
     tree,
-    { selectedPath: selectedEntry?.path ?? null },
+    { selectedPath: selectedEntry?.path ?? null, showExtensions: settings.showMdExtension },
     {
       onOpenFile: (p) => void openNote(p),
       onSelectDir: (p) => {
@@ -939,14 +979,16 @@ async function init(): Promise<void> {
     reportError("getSettings", err); // keep defaults
   }
 
-  try {
-    const last = await api.getLastVault();
-    if (last) {
-      await openVaultByPath(last);
-      return;
+  if (settings.reopenLastVault) {
+    try {
+      const last = await api.getLastVault();
+      if (last) {
+        await openVaultByPath(last);
+        return;
+      }
+    } catch (err) {
+      reportError("autoReopen", err); // vault gone/moved — fall back to recents
     }
-  } catch (err) {
-    reportError("autoReopen", err); // vault gone/moved — fall back to recents
   }
   await renderEmptyState();
 }

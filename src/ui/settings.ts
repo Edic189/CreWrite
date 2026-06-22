@@ -17,12 +17,13 @@ export interface AboutInfo {
   vaultPath: string | null;
 }
 
-type TabId = "appearance" | "editor" | "behavior" | "about";
+type TabId = "appearance" | "editor" | "behavior" | "git" | "about";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "appearance", label: "Appearance" },
   { id: "editor", label: "Editor" },
   { id: "behavior", label: "Behavior" },
+  { id: "git", label: "Git" },
   { id: "about", label: "About" },
 ];
 
@@ -36,6 +37,12 @@ const THEME_SWATCHES: { value: Theme; label: string; bg: string; accent: string 
   { value: "sea", label: "Sea", bg: "#0e2226", accent: "#34c3c3" },
   { value: "retro", label: "Retro", bg: "#f4ecd8", accent: "#b85c38" },
   { value: "summer", label: "Summer", bg: "#fffdf5", accent: "#e8559b" },
+  { value: "dracula", label: "Dracula", bg: "#282a36", accent: "#bd93f9" },
+  { value: "nord", label: "Nord", bg: "#2e3440", accent: "#88c0d0" },
+  { value: "gruvbox", label: "Gruvbox", bg: "#282828", accent: "#fe8019" },
+  { value: "mocha", label: "Mocha", bg: "#2b2420", accent: "#d2a679" },
+  { value: "neon", label: "Neon", bg: "#0d0f1a", accent: "#00e5ff" },
+  { value: "rose", label: "Rosé", bg: "#232136", accent: "#ea9a97" },
 ];
 
 export class SettingsPanel {
@@ -118,6 +125,7 @@ export class SettingsPanel {
     if (this.activeTab === "appearance") this.renderAppearance();
     else if (this.activeTab === "editor") this.renderEditor();
     else if (this.activeTab === "behavior") this.renderBehavior();
+    else if (this.activeTab === "git") this.renderGit();
     else this.renderAbout();
     this.body.scrollTop = 0;
   }
@@ -133,6 +141,15 @@ export class SettingsPanel {
         s.accentColor,
         "Override the theme's accent color. Clear to use the theme default.",
       ),
+    ]);
+
+    this.section("Interface", [
+      this.select("Interface size", String(s.uiScale), [
+        { value: "0.9", label: "Small (90%)" },
+        { value: "1", label: "Default (100%)" },
+        { value: "1.1", label: "Large (110%)" },
+        { value: "1.25", label: "Larger (125%)" },
+      ], (v) => this.update("uiScale", Number(v)), "Zoom the whole interface up or down."),
     ]);
   }
 
@@ -170,6 +187,8 @@ export class SettingsPanel {
         "Automatically close brackets and quotes as you type."),
       this.checkbox("Spellcheck", s.spellcheck, (v) => this.update("spellcheck", v),
         "Underline misspelled words using the system dictionary."),
+      this.checkbox("Highlight active line", s.highlightActiveLine,
+        (v) => this.update("highlightActiveLine", v), "Shade the line the cursor is on."),
       this.checkbox("Indent with tabs", s.indentWithTabs, (v) => this.update("indentWithTabs", v),
         "Tab inserts a real tab character instead of spaces."),
       this.select("Tab size", String(s.tabSize), [
@@ -199,6 +218,25 @@ export class SettingsPanel {
         (v) => this.update("autosaveMs", v), "How long after you stop typing edits are written."),
       this.checkbox("Confirm before delete", s.confirmDelete, (v) => this.update("confirmDelete", v),
         "Ask before moving a note or folder to the Trash."),
+    ]);
+    this.section("Files & startup", [
+      this.checkbox("Reopen last vault on launch", s.reopenLastVault,
+        (v) => this.update("reopenLastVault", v), "Automatically open the vault you used last."),
+      this.checkbox("Show file extensions", s.showMdExtension,
+        (v) => this.update("showMdExtension", v), "Show .md in the file tree (hidden by default)."),
+    ]);
+  }
+
+  private renderGit(): void {
+    const s = this.settings!;
+    this.section("Versioning", [
+      this.checkbox("Enable Git", s.gitEnabled, (v) => this.update("gitEnabled", v),
+        "Show the Git panel in the sidebar and turn on versioning for vaults."),
+      this.number("Auto-commit (minutes)", s.gitAutoCommitMinutes, { min: 0, max: 240, step: 1 },
+        (v) => this.update("gitAutoCommitMinutes", v),
+        "Automatically commit changes on this interval. 0 turns auto-commit off."),
+      this.checkbox("Confirm before discard", s.confirmDiscard, (v) => this.update("confirmDiscard", v),
+        "Ask before discarding all changes since the last commit."),
     ]);
   }
 
