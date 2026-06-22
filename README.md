@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="public/logo.svg" alt="CreWrite" width="440" />
+</div>
+
 # CreWrite
 
 **A fast, local-first, plain-text Markdown note-taking app.** Your notes are just
