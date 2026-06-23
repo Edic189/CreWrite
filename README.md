@@ -140,23 +140,29 @@ takes the opposite stance:
 
 ## Screenshots
 
-**Main interface** — the vault file tree, editor, and backlinks panel.
+**Main window** — file tree, editor, backlinks panel, and the Git panel in the sidebar.
 
-![Main interface](screenshots/main-interface.png)
+![CreWrite main window](screenshots/main-interface.png)
 
-**Reading mode** — Markdown rendered with headings, emphasis, and more.
+**Writing** — the editor, with Git tracking your changes (+added / −removed) in the sidebar.
 
-![Markdown rendered in reading mode](screenshots/markdown-preview.png)
+![Editing a note with the Git panel showing changes](screenshots/editor.png)
 
-**Mermaid diagrams** — ` ```mermaid ` fenced blocks render to SVG inline.
+**Reading mode** — renders Mermaid diagrams (here, a large flowchart).
 
-![Reading mode with a Mermaid architecture diagram](screenshots/mermaid-diagram.png)
+![A large Mermaid diagram rendered in reading mode](screenshots/mermaid.png)
 
-![Rendering a large, complex diagram](screenshots/complex-diagram.png)
+**Built-in Git** — commit changes right from the sidebar, no system Git required.
 
-**Settings** — tabbed panel with theme swatches and a custom accent color.
+![Committing changes from the sidebar](screenshots/git.png)
 
-![Settings panel showing theme swatches](screenshots/settings-themes.png)
+**Themes** — 14 built-in palettes picked from visual swatches, plus a custom accent.
+
+![Settings panel showing the 14 theme swatches](screenshots/themes.png)
+
+**Export** — to PDF or Word, fully in-app.
+
+![The export dialog](screenshots/export.png)
 
 ---
 
