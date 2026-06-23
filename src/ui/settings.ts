@@ -143,14 +143,6 @@ export class SettingsPanel {
       ),
     ]);
 
-    this.section("Interface", [
-      this.select("Interface size", String(s.uiScale), [
-        { value: "0.9", label: "Small (90%)" },
-        { value: "1", label: "Default (100%)" },
-        { value: "1.1", label: "Large (110%)" },
-        { value: "1.25", label: "Larger (125%)" },
-      ], (v) => this.update("uiScale", Number(v)), "Zoom the whole interface up or down."),
-    ]);
   }
 
   private renderEditor(): void {

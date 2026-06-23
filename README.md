@@ -104,6 +104,15 @@ takes the opposite stance:
 - **Backlinks panel** shows every note that links to the one you're reading.
 - **Graph view** visualizes the relationships between notes.
 
+### Version control (built-in Git)
+- **One-click Git** — initialize a repository for your vault from the sidebar. Uses a
+  **compiled-in libgit2**, so there's **no system `git` install required**.
+- **Commit** all changes or **discard** them (restore to the last commit) with two
+  buttons, and see the **+added / −removed** line counts at a glance.
+- Optional **auto-commit** on a timer for hands-off backups, and a master on/off toggle.
+- It's a normal Git repo on disk — clone it, push it elsewhere, or open it in any other
+  Git tool.
+
 ### Export & compile
 - **Built-in export to DOCX and PDF** — fully compiled into the app, **no Pandoc or
   any external tool required**. DOCX is generated with [`docx-rs`] and PDF with
@@ -118,10 +127,11 @@ takes the opposite stance:
   frontmatter stripped) — great for assembling a long document from many notes.
 
 ### Appearance & settings
-- **Tabbed settings panel** (Appearance / Editor / Behavior / About) with inline help
-  text and a one-click **Reset to defaults**.
-- **8 built-in themes** — Dark, Light, Grey, Forest, Winter, Sea, Retro, Summer —
-  picked from visual color **swatches**.
+- **Tabbed settings panel** (Appearance / Editor / Behavior / Git / About) with inline
+  help text and a one-click **Reset to defaults**.
+- **14 built-in themes** — the staples (Dark, Light, Grey, Forest, Winter, Sea, Retro,
+  Summer) plus a fun set (Dracula, Nord, Gruvbox, Mocha, Neon, Rosé) — picked from
+  visual color **swatches**.
 - **Custom accent color** that overrides the theme's accent.
 - Tunable **editor font family** (mono/sans/serif), **font size**, **line height**, and
   an optional **readable line width** that centers text in a comfortable column.
@@ -161,6 +171,7 @@ takes the opposite stance:
 | Markdown        | [`pulldown-cmark`] (GFM) + [`ammonia`] (sanitizer) |
 | Diagrams        | [Mermaid](https://mermaid.js.org) (lazy-loaded) |
 | Export          | [`docx-rs`] (DOCX) + [`genpdf`] (PDF) |
+| Versioning      | [`git2`] (vendored libgit2 — no system git) |
 | Delete safety   | [`trash`] crate (OS Trash) |
 | File watching   | [`notify`] crate |
 
@@ -168,6 +179,7 @@ takes the opposite stance:
 [`ammonia`]: https://crates.io/crates/ammonia
 [`docx-rs`]: https://crates.io/crates/docx-rs
 [`genpdf`]: https://crates.io/crates/genpdf
+[`git2`]: https://crates.io/crates/git2
 [`trash`]: https://crates.io/crates/trash
 [`notify`]: https://crates.io/crates/notify
 
@@ -338,19 +350,25 @@ cargo check                # fast Rust compile check (run inside src-tauri/)
 
 | Tab | Setting | Description |
 |-----|---------|-------------|
-| Appearance | Theme | One of 8 built-in palettes (visual swatches). |
+| Appearance | Theme | One of 14 built-in palettes (visual swatches). |
 | Appearance | Custom accent | Override the theme's accent color; clear to revert. |
 | Editor | Font size / family / line height | Editor typography (mono / sans / serif). |
 | Editor | Readable line width | Cap & center the editor/preview in a comfortable column. |
 | Editor | Wrap long lines | Soft-wrap lines past the editor width. |
 | Editor | Show line numbers | Toggle the line-number gutter. |
 | Editor | Auto-pair brackets | Auto-close brackets and quotes. |
+| Editor | Highlight active line | Shade the line the cursor is on. |
 | Editor | Spellcheck | Underline misspellings via the system dictionary. |
 | Editor | Indent with tabs / Tab size | Tab vs. spaces, and indent width. |
 | Behavior | Open notes in | Default to edit or preview mode. |
 | Behavior | New notes go to | Current folder or vault root. |
 | Behavior | Autosave delay | Debounce before edits are written. |
 | Behavior | Confirm before delete | Ask before moving to the Trash. |
+| Behavior | Reopen last vault | Auto-open the last vault on launch. |
+| Behavior | Show file extensions | Show `.md` in the file tree. |
+| Git | Enable Git | Show the Git panel and turn on versioning. |
+| Git | Auto-commit | Commit changes automatically every N minutes (0 = off). |
+| Git | Confirm before discard | Ask before discarding all changes. |
 | About | — | App version, open vault, and config file location. |
 
 ---

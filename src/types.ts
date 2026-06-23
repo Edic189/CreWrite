@@ -69,7 +69,6 @@ export interface Settings {
   autosaveMs: number;
   confirmDelete: boolean;
   highlightActiveLine: boolean;
-  uiScale: number;
   reopenLastVault: boolean;
   showMdExtension: boolean;
   gitEnabled: boolean;
@@ -97,7 +96,6 @@ export const DEFAULT_SETTINGS: Settings = {
   autosaveMs: 600,
   confirmDelete: true,
   highlightActiveLine: true,
-  uiScale: 1.0,
   reopenLastVault: true,
   showMdExtension: false,
   gitEnabled: true,

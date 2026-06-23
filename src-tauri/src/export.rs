@@ -22,6 +22,40 @@ use crate::error::{AppError, AppResult};
 use crate::markdown;
 use crate::vault::tree;
 
+/// A genpdf image that moves to the top of the next page when it doesn't fit in
+/// the space left on the current one (instead of being clipped at the boundary).
+/// `height_mm` must be ≤ one page's content height, so the deferred render always
+/// fits on the fresh page.
+struct FitImage {
+    image: genpdf::elements::Image,
+    height_mm: f64,
+    done: bool,
+}
+
+impl genpdf::Element for FitImage {
+    fn render(
+        &mut self,
+        context: &genpdf::Context,
+        area: genpdf::render::Area<'_>,
+        style: genpdf::style::Style,
+    ) -> Result<genpdf::RenderResult, genpdf::error::Error> {
+        if self.done {
+            return Ok(genpdf::RenderResult { size: genpdf::Size::new(0.0, 0.0), has_more: false });
+        }
+        // Not enough room left on this page → consume the remainder so genpdf
+        // advances to a new page, where the image will fit and render.
+        if f64::from(area.size().height) + 0.5 < self.height_mm {
+            return Ok(genpdf::RenderResult {
+                size: genpdf::Size::new(0.0, area.size().height),
+                has_more: true,
+            });
+        }
+        let result = self.image.render(context, area, style)?;
+        self.done = true;
+        Ok(result)
+    }
+}
+
 /// One document to export (also used by the popup for naming).
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -456,16 +490,22 @@ fn render_pdf(blocks: &[Block]) -> AppResult<Vec<u8>> {
                 // rendered onto an opaque white canvas, so flattening to RGB is safe.
                 let rgb = image::DynamicImage::ImageRgb8(decoded.to_rgb8());
                 let w_px = rgb.width() as f64;
+                let h_px = rgb.height() as f64;
                 let img = elements::Image::from_dynamic_image(rgb)
                     .map_err(|e| AppError::Export(format!("PDF image failed: {e}")))?;
-                // Display at 1x (PNG is 2x), capped to a ~170mm content width.
-                // Set DPI so width_mm = px / dpi * 25.4 lands on the target.
-                let display_mm = (w_px / 2.0 / 96.0 * 25.4).min(170.0);
-                let dpi = w_px * 25.4 / display_mm;
-                doc.push(
-                    img.with_alignment(genpdf::Alignment::Center)
-                        .with_dpi(dpi as f64),
-                );
+                // Fit within the page content box (≈170mm wide, ≈250mm tall) so a
+                // diagram is never taller than a page. PNG is 2x → /2 at 96dpi.
+                let aspect = h_px / w_px;
+                let mut w_mm = (w_px / 2.0 / 96.0 * 25.4).min(170.0);
+                let mut h_mm = w_mm * aspect;
+                if h_mm > 250.0 {
+                    h_mm = 250.0;
+                    w_mm = h_mm / aspect;
+                }
+                let dpi = w_px * 25.4 / w_mm;
+                let image = img.with_alignment(genpdf::Alignment::Center).with_dpi(dpi);
+                // Render via FitImage so it jumps to the next page if it won't fit.
+                doc.push(FitImage { image, height_mm: h_mm, done: false });
             }
         }
     }

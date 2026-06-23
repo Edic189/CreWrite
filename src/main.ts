@@ -350,8 +350,8 @@ function applySettings(s: Settings): void {
   root.style.setProperty("--editor-line-height", String(s.editorLineHeight));
   root.style.setProperty("--content-width", `${s.contentWidth}px`);
   root.classList.toggle("readable-width", s.readableLineWidth);
-  // Whole-UI zoom (WKWebView/WebView2/WebKitGTK all support `zoom`).
-  root.style.setProperty("zoom", String(s.uiScale || 1));
+  // Clear any zoom left by an older build that had the (removed) UI-scale setting.
+  root.style.removeProperty("zoom");
   editor.setLineWrap(s.lineWrap);
   editor.setSpellcheck(s.spellcheck);
   editor.setLineNumbers(s.lineNumbers);

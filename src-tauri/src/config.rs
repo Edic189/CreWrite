@@ -55,8 +55,6 @@ pub struct Settings {
     pub confirm_delete: bool,
     /// Highlight the editor's current line.
     pub highlight_active_line: bool,
-    /// Whole-interface zoom factor (1.0 = 100%).
-    pub ui_scale: f32,
     /// Auto-reopen the last vault on launch.
     pub reopen_last_vault: bool,
     /// Show file extensions (e.g. `.md`) in the file tree.
@@ -90,7 +88,6 @@ impl Default for Settings {
             autosave_ms: 600,
             confirm_delete: true,
             highlight_active_line: true,
-            ui_scale: 1.0,
             reopen_last_vault: true,
             show_md_extension: false,
             git_enabled: true,
