@@ -65,6 +65,12 @@ pub struct Settings {
     pub git_auto_commit_minutes: u32,
     /// Ask for confirmation before discarding Git changes.
     pub confirm_discard: bool,
+    /// Default export format: "pdf" | "docx".
+    pub export_format: String,
+    /// Default for multi-note export: combine into one file vs. one per note.
+    pub export_combine: bool,
+    /// Default: strip YAML frontmatter on export.
+    pub export_strip_frontmatter: bool,
 }
 
 impl Default for Settings {
@@ -93,6 +99,9 @@ impl Default for Settings {
             git_enabled: true,
             git_auto_commit_minutes: 0,
             confirm_discard: true,
+            export_format: "pdf".into(),
+            export_combine: true,
+            export_strip_frontmatter: false,
         }
     }
 }

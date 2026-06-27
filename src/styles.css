@@ -560,6 +560,13 @@ body {
   white-space: nowrap;
 }
 
+.editor-stats {
+  color: var(--text-dim);
+  font-size: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .save-status {
   color: var(--text-dim);
   font-size: 12px;
@@ -1374,6 +1381,12 @@ body {
   font-size: 11px;
   line-height: 1.35;
   color: var(--text-dim);
+}
+.setting-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-dim);
+  padding: 4px 2px;
 }
 .setting-control {
   background: var(--bg);

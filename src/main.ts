@@ -87,6 +87,7 @@ app.innerHTML = `
       <header class="editor-header">
         <span class="note-title" id="note-title">—</span>
         <div class="editor-header-right">
+          <span class="editor-stats" id="editor-stats"></span>
           <span class="save-status" id="save-status"></span>
           <button id="btn-preview" class="toggle-btn" title="Show preview"></button>
         </div>
@@ -130,6 +131,7 @@ const el = {
   searchResults: document.querySelector<HTMLDivElement>("#search-results")!,
   noteTitle: document.querySelector<HTMLSpanElement>("#note-title")!,
   inlineTitle: document.querySelector<HTMLInputElement>("#inline-title")!,
+  editorStats: document.querySelector<HTMLSpanElement>("#editor-stats")!,
   saveStatus: document.querySelector<HTMLSpanElement>("#save-status")!,
   btnPreview: document.querySelector<HTMLButtonElement>("#btn-preview")!,
   editorBody: document.querySelector<HTMLDivElement>("#editor-body")!,
@@ -332,6 +334,7 @@ async function reloadAfterDiskChange(): Promise<void> {
         preview.setEmpty();
       }
     }
+    refreshEditorStats();
     await api.refreshIndex();
     await refreshContext();
     await refreshTagCache();
@@ -576,6 +579,20 @@ function markEditing(): void {
     setState({ dirty: true });
     setSaveStatus("Editing…");
   }
+  refreshEditorStats();
+}
+
+/** Live word + character count for the open note (cleared when none is open). */
+function refreshEditorStats(): void {
+  if (!getState().activePath) {
+    el.editorStats.textContent = "";
+    return;
+  }
+  const text = editor.getContent();
+  const words = (text.trim().match(/\S+/g) ?? []).length;
+  const chars = [...text].length; // count code points, not UTF-16 units
+  el.editorStats.textContent =
+    `${words.toLocaleString()} word${words === 1 ? "" : "s"} · ${chars.toLocaleString()} character${chars === 1 ? "" : "s"}`;
 }
 
 /** Unique note names for the editor's `[[` autocomplete. */
@@ -867,6 +884,7 @@ async function toggleTask(index: number): Promise<void> {
     const updated = await api.toggleTask(current, index);
     if (updated === current) return;
     editor.setContent(updated);
+    refreshEditorStats();
     await saveActiveNote(updated);
     void updatePreview();
   } catch (err) {
@@ -909,6 +927,7 @@ function applyVault(info: VaultInfo): void {
   setInlineTitle(null);
   setSaveStatus("");
   editor.clear();
+  refreshEditorStats();
   preview.setEmpty();
   refreshTreeView();
   void showBacklinks();
@@ -1006,6 +1025,7 @@ async function openNote(path: string): Promise<void> {
     setInlineTitle(path);
     setSaveStatus("Saved");
     editor.setContent(content);
+    refreshEditorStats();
     // Open in the configured default view (focuses the editor, or renders preview).
     setPreviewMode(settings.defaultView === "preview");
     refreshTreeView();
@@ -1222,6 +1242,7 @@ async function deleteSelected(): Promise<void> {
       el.noteTitle.textContent = "—";
       setInlineTitle(null);
       editor.clear();
+      refreshEditorStats();
       preview.setEmpty();
     }
     // Reset the folder context if it pointed into the deleted path.
@@ -1306,6 +1327,7 @@ async function handleVaultChanged(event: ChangeEvent): Promise<void> {
     setInlineTitle(null);
     setSaveStatus("File deleted on disk");
     editor.clear();
+    refreshEditorStats();
     preview.setEmpty();
     refreshTreeView();
     return;
@@ -1326,6 +1348,7 @@ async function handleVaultChanged(event: ChangeEvent): Promise<void> {
       }
       setState({ savedContent: content, dirty: false });
       editor.setContent(content);
+      refreshEditorStats();
       void updatePreview();
       setSaveStatus("Reloaded from disk");
     } catch (err) {
@@ -1355,7 +1378,14 @@ async function openSettings(): Promise<void> {
   settingsPanel.open(settings, { ...info, vaultPath: getState().vaultRoot ?? null });
 }
 el.btnExport.addEventListener("click", () =>
-  exportPanel.open({ activePath: getState().activePath, selectedDir }),
+  exportPanel.open(
+    { activePath: getState().activePath, selectedDir },
+    {
+      format: settings.exportFormat,
+      combine: settings.exportCombine,
+      stripFrontmatter: settings.exportStripFrontmatter,
+    },
+  ),
 );
 el.btnCompile.addEventListener("click", () => void compileFolder());
 el.btnRename.addEventListener("click", () => void renameSelected());

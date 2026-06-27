@@ -8,6 +8,13 @@ export interface ExportContext {
   selectedDir: string; // "" = vault root
 }
 
+/** Initial format/combine/strip values (the user's saved Export settings). */
+export interface ExportDefaults {
+  format: "pdf" | "docx";
+  combine: boolean;
+  stripFrontmatter: boolean;
+}
+
 export interface ExportOptions {
   format: "pdf" | "docx";
   scope: "note" | "folder" | "vault";
@@ -57,8 +64,13 @@ export class ExportPanel {
     });
   }
 
-  open(ctx: ExportContext): void {
+  open(ctx: ExportContext, defaults?: ExportDefaults): void {
     this.ctx = ctx;
+    if (defaults) {
+      this.state.format = defaults.format;
+      this.state.combine = defaults.combine;
+      this.state.stripFrontmatter = defaults.stripFrontmatter;
+    }
     this.state.scope = ctx.activePath ? "note" : ctx.selectedDir ? "folder" : "vault";
     this.render();
     this.overlay.hidden = false;

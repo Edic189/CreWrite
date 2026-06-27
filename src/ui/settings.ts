@@ -17,13 +17,14 @@ export interface AboutInfo {
   vaultPath: string | null;
 }
 
-type TabId = "appearance" | "editor" | "behavior" | "git" | "about";
+type TabId = "appearance" | "editor" | "behavior" | "git" | "export" | "about";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "appearance", label: "Appearance" },
   { id: "editor", label: "Editor" },
   { id: "behavior", label: "Behavior" },
   { id: "git", label: "Git" },
+  { id: "export", label: "Export" },
   { id: "about", label: "About" },
 ];
 
@@ -126,6 +127,7 @@ export class SettingsPanel {
     else if (this.activeTab === "editor") this.renderEditor();
     else if (this.activeTab === "behavior") this.renderBehavior();
     else if (this.activeTab === "git") this.renderGit();
+    else if (this.activeTab === "export") this.renderExport();
     else this.renderAbout();
     this.body.scrollTop = 0;
   }
@@ -232,6 +234,25 @@ export class SettingsPanel {
     ]);
   }
 
+  private renderExport(): void {
+    const s = this.settings!;
+    this.section("Defaults", [
+      this.select("File type", s.exportFormat, [
+        { value: "pdf", label: "PDF" },
+        { value: "docx", label: "Word (.docx)" },
+      ], (v) => this.update("exportFormat", v as Settings["exportFormat"]),
+        "Format the export dialog opens with."),
+      this.checkbox("Combine into one file", s.exportCombine, (v) => this.update("exportCombine", v),
+        "When exporting a folder or the vault, merge notes into a single document (vs. one file per note)."),
+      this.checkbox("Strip frontmatter", s.exportStripFrontmatter,
+        (v) => this.update("exportStripFrontmatter", v),
+        "Remove YAML frontmatter from exported documents."),
+    ]);
+    this.section("Notes", [
+      this.note("Export is built in — no Pandoc or other tools needed. Mermaid diagrams are embedded as images in PDF; in Word they export as their source text. Start an export from the toolbar's download button."),
+    ]);
+  }
+
   private renderAbout(): void {
     const section = document.createElement("div");
     section.className = "settings-section";
@@ -284,6 +305,14 @@ export class SettingsPanel {
     section.appendChild(heading);
     for (const row of rows) section.appendChild(row);
     this.body.appendChild(section);
+  }
+
+  /** A small dim informational paragraph (for a section, not a control). */
+  private note(text: string): HTMLElement {
+    const el = document.createElement("div");
+    el.className = "setting-note";
+    el.textContent = text;
+    return el;
   }
 
   /** A labelled row: stacked label + help on the left, control on the right. */

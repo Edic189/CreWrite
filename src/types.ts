@@ -74,6 +74,9 @@ export interface Settings {
   gitEnabled: boolean;
   gitAutoCommitMinutes: number;
   confirmDiscard: boolean;
+  exportFormat: "pdf" | "docx";
+  exportCombine: boolean;
+  exportStripFrontmatter: boolean;
 }
 
 /** Defaults — must mirror the Rust `Settings::default()`. */
@@ -101,6 +104,9 @@ export const DEFAULT_SETTINGS: Settings = {
   gitEnabled: true,
   gitAutoCommitMinutes: 0,
   confirmDiscard: true,
+  exportFormat: "pdf",
+  exportCombine: true,
+  exportStripFrontmatter: false,
 };
 
 /** App version + config location (from the `app_info` command). */
